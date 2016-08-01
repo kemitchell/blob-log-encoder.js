@@ -21,7 +21,7 @@ tape('round-trip 100 blobs', function (test) {
     // Pipe to a new log file.
     encoder
     .pipe(fs.createWriteStream(filePath))
-    .once('error', function (error) {
+    .once('error', /* istanbul ignore next */ function (error) {
       test.fail(error)
       finish()
     })
@@ -30,7 +30,7 @@ tape('round-trip 100 blobs', function (test) {
       var readBlobs = []
       fs.createReadStream(filePath)
       .pipe(new Decoder())
-      .once('error', function (error) {
+      .once('error', /* istanbul ignore next */ function (error) {
         test.fail(error)
         finish()
       })
@@ -79,7 +79,7 @@ tape('append additional blobs', function (test) {
     var firstEncoder = new Encoder(1)
     firstEncoder
     .pipe(fs.createWriteStream(filePath))
-    .once('error', function (error) {
+    .once('error', /* istanbul ignore next */ function (error) {
       test.fail(error)
     })
     .once('finish', function () {
@@ -88,7 +88,7 @@ tape('append additional blobs', function (test) {
       var secondEncoder = new Encoder() // no first sequence number
       secondEncoder
       .pipe(fs.createWriteStream(filePath, {flags: 'a'})) // append
-      .once('error', function (error) {
+      .once('error', /* istanbul ignore next */ function (error) {
         test.fail(error)
       })
       .once('finish', function () {
@@ -96,7 +96,7 @@ tape('append additional blobs', function (test) {
         var readBlobs = []
         fs.createReadStream(filePath)
         .pipe(new Decoder())
-        .once('error', function (error) {
+        .once('error', /* istanbul ignore next */ function (error) {
           test.fail(error)
           finish()
         })
@@ -139,6 +139,35 @@ tape('append additional blobs', function (test) {
       test.end()
     }
   })
+})
+
+tape('construct without new', function (test) {
+  mktempd(function (error, directory, cleanUp) {
+    test.ifError(error, 'no error')
+    Encoder(1)
+    .pipe(fs.createWriteStream(path.join(directory, 'test.log')))
+    .once('finish', function () {
+      cleanUp()
+      test.end()
+    })
+    .end()
+  })
+})
+
+tape('invalid first sequence number', function (test) {
+  test.throws(function () {
+    Encoder(0)
+  }, /invalid first sequence number/)
+  test.end()
+})
+
+tape('non-buffer object', function (test) {
+  Encoder()
+  .once('error', function (error) {
+    test.equal(error.message, 'object not a Buffer or String')
+    test.end()
+  })
+  .end('string blob!')
 })
 
 function bufferBlob (blob, done) {

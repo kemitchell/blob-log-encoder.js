@@ -37,7 +37,7 @@ var prototype = Encoder.prototype
 
 prototype._transform = function (blob, _, callback) {
   if (!Buffer.isBuffer(blob)) {
-    var error = new Error('object not a Buffer or string')
+    var error = new Error('object not a Buffer or String')
     error.object = blob
     callback(error)
   } else {
