@@ -15,6 +15,12 @@ those chunks represent arbitrary slices of a single, continuous stream
 of of bytes.  In contrast, each `Buffer` written to a `BlobLogEncoder`
 represents _all_ the bytes in a _single_ blob.
 
+It's possible to stream data to blob-log files, too, though it takes
+an extra write to write in correct CRC-32 and length prefixes when
+those values aren't known ahead of time.  See [stream-to-blob-log].
+
+[stream-to-blob-log]: https://www.npmjs.com/package/stream-to-blob-log
+
 ### Write Blobs to a New Log File
 
 ```javascript
